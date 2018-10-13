@@ -35,11 +35,11 @@
 // @grant			GM_xmlhttpRequest
 // @grant			unsafeWindow
 // @run-at			document-end
-// @version			3.26
+// @version			3.26.1
 // @license			http://creativecommons.org/licenses/by-nc-nd/3.0/
 // @author			Barbarossa69
 // @contributionURL	https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8VEDPV3X9X82L
-// @releasenotes	<p>Transport Tab - Remember last troop type used</p><p>Champ Wildhide set bonus</p>
+// @releasenotes	<p>Fix for transport routes</p>
 // ==/UserScript==
 
 //	+-------------------------------------------------------------------------------------------------------+
@@ -50,7 +50,7 @@
 //	¦	July 2014 Barbarossa69 (www.facebook.com/barbarossa69)												¦
 //	+-------------------------------------------------------------------------------------------------------+
 
-var Version = '3.26';
+var Version = '3.26.1';
 var SourceName = "Power Bot Plus";
 
 function GlobalOptionsUpdate () { // run-once code to update Global Options
@@ -41011,7 +41011,7 @@ Tabs.Transport = {
 
 		if (!t.validateScreenFields('save')) { return; }
 
-		Options.TransportOptions.LastTroopType = t.RoutObject.TroopType;
+		Options.TransportOptions.LastTroopType = t.RouteObject.TroopType;
 		saveOptions();
 		
 		if (t.EditRouteNumber<0 || CopyRoute) {
