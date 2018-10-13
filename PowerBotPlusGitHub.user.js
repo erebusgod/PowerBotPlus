@@ -35,11 +35,11 @@
 // @grant			GM_xmlhttpRequest
 // @grant			unsafeWindow
 // @run-at			document-end
-// @version			3.25.1
+// @version			3.26
 // @license			http://creativecommons.org/licenses/by-nc-nd/3.0/
 // @author			Barbarossa69
 // @contributionURL	https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8VEDPV3X9X82L
-// @releasenotes	<p>Fix for legacy browsers</p>
+// @releasenotes	<p>Transport Tab - Remember last troop type used</p><p>Champ Wildhide set bonus</p>
 // ==/UserScript==
 
 //	+-------------------------------------------------------------------------------------------------------+
@@ -50,7 +50,7 @@
 //	¦	July 2014 Barbarossa69 (www.facebook.com/barbarossa69)												¦
 //	+-------------------------------------------------------------------------------------------------------+
 
-var Version = '3.25.1';
+var Version = '3.26';
 var SourceName = "Power Bot Plus";
 
 function GlobalOptionsUpdate () { // run-once code to update Global Options
@@ -170,6 +170,7 @@ var BaseChamp				= {201:30,202:0,203:7,204:27,205:27,206:60,207:4,208:3,209:3};
 var SteelHoofItems			= [28119, 28120, 28121, 28122, 28123, 28124, 2812, 28510, 28638];
 var LightBringerItems		= [28125, 28126, 28127, 28128, 28129, 28130, 28131, 28640];
 var DragonScaleItems		= [28133, 28134, 28135, 28136, 28137, 28138, 28139, 28644];
+var WildHideItems			= [28657, 28663, 28662, 28658, 28659, 28660, 28661, 28664];
 var fortmight				= {f53:4, f55:7, f60:1, f61:2, f62:3, f63:10};
 
 var TranslatePublish = {80:"300645083384735", 50:"275425949243301", 40:"291667064279714", 10:"286958161406148"};
@@ -531,15 +532,12 @@ var Options = {
 	enhancedinbox				: true,
 	enhanceARpts				: true,
 	enhanceViewMembers			: true,
-	dispBattleRounds			: true,
-	reportDeleteButton			: true,
 	EnhCBtns					: true,
 	DbClkDefBtns				: false,
 	ColrCityBtns				: true,
 	WarnAscension				: true,
 	WarnAscensionInterval		: 1,
 	mapCoordsTop				: true,
-	fixLoadCap					: true,
 	fixTRAetherCost				: true,
 	fixMMBImage					: true,
 	OverrideAttackAlert			: true,
@@ -1282,6 +1280,7 @@ function ModifyUWObjects () {
 							var SteelHoofCount = CHAMP_DATA.SteelHoofCount;
 							var LightBringerCount = CHAMP_DATA.LightBringerCount;
 							var DragonScaleCount = CHAMP_DATA.DragonScaleCount;
+							var WildHideCount = CHAMP_DATA.WildHideCount;
 
 							var gotchamp = false;
 							for (var k in equippedchampstats) {
@@ -1322,6 +1321,12 @@ function ModifyUWObjects () {
 									if (LightBringerCount >= 5) {
 										gottroops = true;
 										oureffects+="<tr><td>"+uW.g_js_strings.champ.lightbringersBonus+": "+uW.g_js_strings.champ.attack+"</td><td>"+CM.CHAMPION.getLightbringersRangeSetBonus().replace('+','')+"</td></tr>";
+									}
+									else {
+										if (WildHideCount >= 5) {
+											gottroops = true;
+											oureffects+="<tr><td>"+uW.g_js_strings.champ.wildhideBonus+": "+uW.g_js_strings.champ.attack+"</td><td>"+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')+"</td></tr>";
+										}
 									}
 								}
 							}
@@ -2994,6 +2999,7 @@ function BuildChampData (champItems,championId) {
 	res.SteelHoofCount = 0;
 	res.LightBringerCount = 0;
 	res.DragonScaleCount = 0;
+	res.WildHideCount = 0;
 	res.might = 0;
 
 	for (var y in champItems) { // calculate unique set bonuses
@@ -3004,6 +3010,7 @@ function BuildChampData (champItems,championId) {
 			if (SteelHoofItems.indexOf(parseIntNan(item.unique)) !== -1) { res.SteelHoofCount++ }
 			if (LightBringerItems.indexOf(parseIntNan(item.unique)) !== -1) { res.LightBringerCount++ }
 			if (DragonScaleItems.indexOf(parseIntNan(item.unique)) !== -1) { res.DragonScaleCount++ }
+			if (WildHideItems.indexOf(parseIntNan(item.unique)) !== -1) { res.WildHideCount++ }
 
 			for (var e in item.effects) {
 				if (Number(e) <= Number(item.rarity)) {
@@ -3102,6 +3109,7 @@ function EverySecond () {
 
 		try {
 			CheckForIncoming();
+		}	
 		catch (err) {
 			logerr(err); // write to log
 		}
@@ -27906,8 +27914,9 @@ Tabs.Player = {
 							var SteelHoofCount = CHAMP_DATA.SteelHoofCount;
 							var LightBringerCount = CHAMP_DATA.LightBringerCount;
 							var DragonScaleCount = CHAMP_DATA.DragonScaleCount;
+							var WildHideCount = CHAMP_DATA.WildHideCount;
 							var might = CHAMP_DATA.might;
-
+							var TroopBonus = 0;
 
 							m += '<tr><td class=xtab colspan=2><b>Might:&nbsp;</b>'+addCommas(might)+'</td></tr>';
 							m += '<tr><td colspan=2 class=xtab><b>'+uW.g_js_strings.report_view.champion_stats+'</b></td></tr>';
@@ -27916,7 +27925,10 @@ Tabs.Player = {
 								var chEffect = getChampCappedValue(k,equippedchampstats[k]);
 								if (k>= 300) {
 									if (k==314) { str = '<span style="color:#808;">'+tx('Add. Defend Bonus')+'</span>'; }
-									else { str = '<span style="color:#808;">'+tx('Inc. Bonus')+' '+str.split(" "+tx("equipment"))[0]+'</span>'; }
+									else {
+										str = '<span style="color:#808;">'+tx('Inc. Bonus')+' '+str.split(" "+tx("equipment"))[0]+'</span>'; 
+//										TroopBonus += chEffect;
+									}
 									var champvalue = '<span style="color:#808;">'+((chEffect*100).toFixed(2))+"%</span>";
 								}
 								else {
@@ -27948,6 +27960,12 @@ Tabs.Player = {
 										gottroops = true;
 										m+='<tr><td class=xtab><span style="color:#800;">'+uW.g_js_strings.champ.lightbringersBonus+': '+uW.g_js_strings.champ.attack+'</span></td><td class=xtab><span style="color:#080;">'+CM.CHAMPION.getLightbringersRangeSetBonus().replace('+','')+'</span></td></tr>';
 									}
+									else {
+										if (WildHideCount >= 5) {
+											gottroops = true;
+											m+='<tr><td class=xtab><span style="color:#800;">'+uW.g_js_strings.champ.wildhideBonus+': '+uW.g_js_strings.champ.attack+'</span></td><td class=xtab><span style="color:#080;">'+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')+'</span></td></tr>';
+										}
+									}
 								}
 							}
 							for (var k in equippedtroopstats) {
@@ -27956,7 +27974,7 @@ Tabs.Player = {
 								if (str && str!= "") {
 									str = uW.g_js_strings.effects['name_'+k];
 									var chEffect = getChampCappedValue(k,equippedtroopstats[k]);
-									m += '<tr><td class=xtab>'+TRStyles.LineStyle+str+':'+TRStyles.EndStyle+'</td><td class=xtab>'+TRStyles.LineStyle+(Math.round(chEffect*100)/100)+TRStyles.EndStyle+'</td></tr>';
+									m += '<tr><td class=xtab>'+TRStyles.LineStyle+str+':'+TRStyles.EndStyle+'</td><td class=xtab>'+TRStyles.LineStyle+(Math.round((chEffect+(chEffect*TroopBonus))*100)/100)+TRStyles.EndStyle+'</td></tr>';
 								}
 							}
 							if (!gottroops) {
@@ -40314,6 +40332,7 @@ Tabs.Transport = {
 		ThroneCheck: false,
 		MarchSpeed: 0,
 		Priority: "1,4,5,3,2", // food, ore, aether, stone, wood
+		LastTroopType: 9,
 	},
 	NewRouteObject : {
 		cityId: null,
@@ -40688,6 +40707,7 @@ Tabs.Transport = {
 				t.RouteObject[y] = t.NewRouteObject[y];
 			}
 			t.RouteObject.Interval = Options.TransportOptions.TransportInterval;
+			t.RouteObject.TroopType = Options.TransportOptions.LastTroopType;
 		}
 		t.PaintNewRoutePanel();
 	},
@@ -40991,6 +41011,9 @@ Tabs.Transport = {
 
 		if (!t.validateScreenFields('save')) { return; }
 
+		Options.TransportOptions.LastTroopType = t.RoutObject.TroopType;
+		saveOptions();
+		
 		if (t.EditRouteNumber<0 || CopyRoute) {
 			Options.TransportOptions.Routes.push(JSON2.parse(JSON2.stringify(t.RouteObject))); // create new object in array
 			if (CopyRoute) { t.RouteObject = null; } // clear route object
