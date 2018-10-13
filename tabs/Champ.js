@@ -1,5 +1,5 @@
 /**************************** Champ Tab ****************************************/
-// @tabversion 20180407
+// @tabversion 20181010
 
 Tabs.Champ = {
 	MinVersion: '3.04',
@@ -5481,6 +5481,7 @@ Tabs.Champ = {
 		var SteelHoofCount = 0;
 		var LightBringerCount = 0;
 		var DragonScaleCount = 0;
+		var WildHideCount = 0;
 		var effectTiers = CE_EFFECT_TIERS;
 		var Indent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		var J = new Array();
@@ -5496,6 +5497,7 @@ Tabs.Champ = {
 			if (SteelHoofItems.indexOf(parseIntNan(item.unique)) !== -1) { SteelHoofCount++ }
 			if (LightBringerItems && LightBringerItems.indexOf(parseIntNan(item.unique)) !== -1) { LightBringerCount++ }
 			if (DragonScaleItems && DragonScaleItems.indexOf(parseIntNan(item.unique)) !== -1) { DragonScaleCount++ }
+			if (WildHideItems && WildHideItems.indexOf(parseIntNan(item.unique)) !== -1) { WildHideCount++ }
 
 			for (var e in item.effects) {
 				if (Number(e) <= Number(item.rarity)) {
@@ -5662,6 +5664,20 @@ Tabs.Champ = {
 						}
 					}
 					else { J.push(Indent+uW.g_js_strings.champ.lightbringersBonus+": "+uW.g_js_strings.champ.attack+" "+CM.CHAMPION.getLightbringersRangeSetBonus().replace('+','')); }
+				}
+				else {
+					if (WildHideCount >= 5) {
+						gottroops = true;
+						if (htmlEffects) {
+							if (Colours) {
+								J.push("<div style='color:#800;'>"+Indent+uW.g_js_strings.champ.wildhideBonus+": "+uW.g_js_strings.champ.attack+"&nbsp;"+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')+"</div>");
+							}
+							else {
+								J.push("<div>"+Indent+uW.g_js_strings.champ.wildhideBonus+": "+uW.g_js_strings.champ.attack+"&nbsp;"+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')+"</div>");
+							}
+						}
+						else { J.push(Indent+uW.g_js_strings.champ.wildhideBonus+": "+uW.g_js_strings.champ.attack+" "+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')); }
+					}
 				}
 			}
 		}
@@ -5884,6 +5900,7 @@ Tabs.Champ = {
 		var SteelHoofCount = 0;
 		var LightBringerCount = 0;
 		var DragonScaleCount = 0;
+		var WildHideCount = 0;
 		var effectTiers = CE_EFFECT_TIERS;
 		var Indent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		var J = new Array();
@@ -5899,6 +5916,7 @@ Tabs.Champ = {
 			if (SteelHoofItems.indexOf(parseIntNan(item.unique)) !== -1) { SteelHoofCount++ }
 			if (LightBringerItems && LightBringerItems.indexOf(parseIntNan(item.unique)) !== -1) { LightBringerCount++ }
 			if (DragonScaleItems && DragonScaleItems.indexOf(parseIntNan(item.unique)) !== -1) { DragonScaleCount++ }
+			if (WildHideItems && WildHideItems.indexOf(parseIntNan(item.unique)) !== -1) { WildHideCount++ }
 
 			for (var e in item.effects) {
 				if (Number(e) <= Number(item.rarity)) {
@@ -6065,6 +6083,18 @@ Tabs.Champ = {
 						}
 					}
 					else { J.push(Indent+uW.g_js_strings.champ.lightbringersBonus+": "+uW.g_js_strings.champ.attack+" "+CM.CHAMPION.getLightbringersRangeSetBonus().replace('+','')); }
+				}
+				else {
+					gottroops = true;
+					if (htmlEffects) {
+						if (Colours) {
+							J.push("<div style='color:#800;'>"+Indent+uW.g_js_strings.champ.wildhideBonus+": "+uW.g_js_strings.champ.attack+"&nbsp;"+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')+"</div>");
+						}
+						else {
+							J.push("<div>"+Indent+uW.g_js_strings.champ.wildhideBonus+": "+uW.g_js_strings.champ.attack+"&nbsp;"+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')+"</div>");
+						}
+					}
+					else { J.push(Indent+uW.g_js_strings.champ.wildhideBonus+": "+uW.g_js_strings.champ.attack+" "+CM.CHAMPION.getWildhideAttackSetBonus().replace('+','')); }
 				}
 			}
 		}
